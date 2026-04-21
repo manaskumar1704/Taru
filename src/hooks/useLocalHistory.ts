@@ -18,6 +18,7 @@ export interface LessonHistoryItem {
   topic: string
   grade: string
   timestamp: number
+  quizScore: { correct: number; total: number } | null
   data: LessonResponse
 }
 
@@ -38,12 +39,13 @@ export function useLocalHistory() {
     }
   }, [])
 
-  const addLesson = (topic: string, grade: string, data: LessonResponse) => {
+  const addLesson = (topic: string, grade: string, data: LessonResponse): LessonHistoryItem => {
     const newItem: LessonHistoryItem = {
       id: crypto.randomUUID(),
       topic,
       grade,
       timestamp: Date.now(),
+      quizScore: null,
       data,
     }
 
@@ -56,14 +58,31 @@ export function useLocalHistory() {
       }
       return updated
     })
+    return newItem
   }
 
   const clearHistory = () => {
     setHistory([])
     try {
       window.localStorage.removeItem(STORAGE_KEY)
-    } catch (e) {}
+    } catch {
+      // ignore
+    }
   }
 
-  return { history, addLesson, clearHistory }
+  const updateLessonScore = (id: string, score: { correct: number; total: number }) => {
+    setHistory((prev) => {
+      const updated = prev.map((item) =>
+        item.id === id ? { ...item, quizScore: score } : item
+      )
+      try {
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
+      } catch (e) {
+        console.error("Failed to update lesson score in localStorage", e)
+      }
+      return updated
+    })
+  }
+
+  return { history, addLesson, clearHistory, updateLessonScore }
 }

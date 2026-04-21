@@ -10,6 +10,7 @@ import { SimulationPanel } from "@/components/dashboard/SimulationPanel"
 import { SynthesisOutput } from "@/components/dashboard/SynthesisOutput"
 import { CriticalVectors } from "@/components/dashboard/CriticalVectors"
 import { ActiveAssessment } from "@/components/dashboard/ActiveAssessment"
+import { ProgressModal } from "@/components/dashboard/ProgressModal"
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet"
 
 export const cardVariants: Variants = {
@@ -28,8 +29,10 @@ export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isProgressModalOpen, setIsProgressModalOpen] = useState(false)
+  const [currentLessonId, setCurrentLessonId] = useState<string | null>(null)
   
-  const { history, addLesson } = useLocalHistory()
+  const { history, addLesson, updateLessonScore } = useLocalHistory()
 
   const handleGenerate = async () => {
     if (!topic || !grade) {
@@ -55,7 +58,8 @@ export default function Dashboard() {
       }
 
       setLessonData(data)
-      addLesson(topic, grade, data)
+      const newLesson = addLesson(topic, grade, data)
+      setCurrentLessonId(newLesson?.id || null)
     } catch (err) {
       setError(err instanceof Error ? err.message : "An unexpected system error occurred.")
     } finally {
@@ -67,6 +71,7 @@ export default function Dashboard() {
     setTopic(lesson.topic)
     setGrade(lesson.grade)
     setLessonData(lesson.data)
+    setCurrentLessonId(lesson.id)
     setError(null)
     setIsMobileMenuOpen(false)
   }
@@ -100,6 +105,7 @@ export default function Dashboard() {
         history={history} 
         onSelectLesson={handleSelectLesson} 
         onNewSimulation={handleNewSimulation} 
+        onProgressClick={() => setIsProgressModalOpen(true)}
       />
 
       <main className="flex-1 flex flex-col h-full overflow-hidden">
@@ -123,6 +129,10 @@ export default function Dashboard() {
                   history={history} 
                   onSelectLesson={handleSelectLesson} 
                   onNewSimulation={handleNewSimulation} 
+                  onProgressClick={() => {
+                    setIsMobileMenuOpen(false)
+                    setIsProgressModalOpen(true)
+                  }}
                 />
               </div>
             </SheetContent>
@@ -170,7 +180,12 @@ export default function Dashboard() {
                 
                 <ActiveAssessment 
                   quiz={lessonData?.quiz || null} 
-                  isLoading={isLoading} 
+                  isLoading={isLoading}
+                  onScoreSubmit={(score) => {
+                    if (currentLessonId) {
+                      updateLessonScore(currentLessonId, score)
+                    }
+                  }}
                 />
               </div>
             </motion.div>
@@ -178,6 +193,12 @@ export default function Dashboard() {
           </div>
         </div>
       </main>
+
+      <ProgressModal
+        isOpen={isProgressModalOpen}
+        onClose={() => setIsProgressModalOpen(false)}
+        history={history}
+      />
     </div>
   )
 }

@@ -26,16 +26,21 @@ export interface QuizQuestion {
 interface ActiveAssessmentProps {
   quiz: QuizQuestion[] | null
   isLoading: boolean
+  onScoreSubmit?: (score: { correct: number; total: number }) => void
 }
 
-export function ActiveAssessment({ quiz, isLoading }: ActiveAssessmentProps) {
+export function ActiveAssessment({ quiz, isLoading, onScoreSubmit }: ActiveAssessmentProps) {
   const [currentIdx, setCurrentIdx] = useState(0)
   const [selectedOpt, setSelectedOpt] = useState<string | null>(null)
+  const [correctAnswers, setCorrectAnswers] = useState(0)
+  const [isSubmitted, setIsSubmitted] = useState(false)
   
   // Reset state when new quiz data comes in
   useEffect(() => {
     setCurrentIdx(0)
     setSelectedOpt(null)
+    setCorrectAnswers(0)
+    setIsSubmitted(false)
   }, [quiz])
 
   if (isLoading) {
@@ -77,12 +82,22 @@ export function ActiveAssessment({ quiz, isLoading }: ActiveAssessmentProps) {
   const handleSelect = (opt: string) => {
     if (isAnswered) return
     setSelectedOpt(opt)
+    if (opt === question.correctAnswer) {
+      setCorrectAnswers((prev) => prev + 1)
+    }
   }
 
   const handleNext = () => {
     if (currentIdx < quiz.length - 1) {
       setCurrentIdx((prev) => prev + 1)
       setSelectedOpt(null)
+    }
+  }
+
+  const handleSubmit = () => {
+    setIsSubmitted(true)
+    if (onScoreSubmit) {
+      onScoreSubmit({ correct: correctAnswers, total: quiz.length })
     }
   }
 
@@ -183,13 +198,28 @@ export function ActiveAssessment({ quiz, isLoading }: ActiveAssessmentProps) {
               </motion.button>
             )}
             
-            {isAnswered && currentIdx === quiz.length - 1 && (
+            {isAnswered && currentIdx === quiz.length - 1 && !isSubmitted && (
+              <motion.button
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                whileHover={{ scale: 1.02 }}
+                onClick={handleSubmit}
+                className="mt-6 w-full flex items-center justify-center gap-2 p-3 text-sm font-medium rounded-lg bg-[linear-gradient(135deg,var(--primary),var(--ring))] text-primary-foreground glow-primary transition-colors shrink-0"
+              >
+                Submit Assessment ({correctAnswers}/{quiz.length})
+              </motion.button>
+            )}
+            
+            {isSubmitted && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="mt-6 flex items-center justify-center p-3 text-sm font-medium rounded-lg bg-tertiary/20 text-tertiary border border-tertiary/30 shrink-0"
+                className="mt-6 flex flex-col items-center justify-center gap-2 p-4 text-sm font-medium rounded-lg bg-tertiary/20 text-tertiary border border-tertiary/30 shrink-0"
               >
-                Assessment Complete!
+                <span>Score: {correctAnswers}/{quiz.length}</span>
+                <span className="text-xs text-tertiary/70">
+                  {Math.round((correctAnswers / quiz.length) * 100)}% correct
+                </span>
               </motion.div>
             )}
           </motion.div>

@@ -7,9 +7,10 @@ interface SidebarProps {
   history: LessonHistoryItem[]
   onSelectLesson: (lesson: LessonHistoryItem) => void
   onNewSimulation: () => void
+  onProgressClick: () => void
 }
 
-export function Sidebar({ history, onSelectLesson, onNewSimulation }: SidebarProps) {
+export function Sidebar({ history, onSelectLesson, onNewSimulation, onProgressClick }: SidebarProps) {
   return (
     <aside className="w-[260px] flex-col border-r border-border bg-muted/30 p-4 h-full hidden md:flex">
       {/* Brand */}
@@ -43,10 +44,13 @@ export function Sidebar({ history, onSelectLesson, onNewSimulation }: SidebarPro
           <BookOpen className="size-4" />
           Lessons
         </a>
-        <a href="#" className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground hover:bg-accent/30 transition-colors font-medium">
+        <button 
+          onClick={onProgressClick}
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground hover:bg-accent/30 transition-colors font-medium"
+        >
           <BarChart3 className="size-4" />
           Progress
-        </a>
+        </button>
       </nav>
 
       {/* History */}
@@ -65,10 +69,19 @@ export function Sidebar({ history, onSelectLesson, onNewSimulation }: SidebarPro
                 className="flex w-full flex-col items-start gap-1 rounded-lg p-3 text-left transition-colors hover:bg-accent/40"
               >
                 <div className="truncate w-full font-heading text-sm font-semibold">{lesson.topic}</div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <span className="inline-flex items-center rounded-md bg-secondary/20 px-1.5 py-0.5 text-[10px] font-medium text-secondary">
                     {lesson.grade}
                   </span>
+                  {lesson.quizScore && (
+                    <span className={`inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-medium ${
+                      lesson.quizScore.correct / lesson.quizScore.total >= 0.7
+                        ? "bg-tertiary/20 text-tertiary"
+                        : "bg-destructive/20 text-destructive"
+                    }`}>
+                      {lesson.quizScore.correct}/{lesson.quizScore.total}
+                    </span>
+                  )}
                   <span className="text-[10px] text-muted-foreground">
                     {new Date(lesson.timestamp).toLocaleDateString()}
                   </span>
