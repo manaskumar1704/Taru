@@ -1,5 +1,5 @@
 import { LessonHistoryItem } from "@/hooks/useLocalHistory"
-import { Plus, LayoutDashboard, BookOpen, BarChart3, Settings as SettingsIcon } from "lucide-react"
+import { Plus, LayoutDashboard, BarChart3, Settings as SettingsIcon } from "lucide-react"
 import { ThemeToggle } from "./ThemeToggle"
 import { UserProfileConfig } from "./UserProfileConfig"
 
@@ -30,7 +30,7 @@ export function Sidebar({ history, onSelectLesson, onNewSimulation, onProgressCl
         className="mb-8 flex w-full items-center justify-center gap-2 rounded-lg bg-[linear-gradient(135deg,var(--primary),var(--ring))] p-3 text-sm font-semibold text-primary-foreground glow-primary transition-transform hover:scale-[1.02] active:scale-[0.98]"
       >
         <Plus className="size-4" />
-        New Simulation
+        New Lesson
       </button>
 
       {/* Main Nav */}
@@ -40,10 +40,7 @@ export function Sidebar({ history, onSelectLesson, onNewSimulation, onProgressCl
           <LayoutDashboard className="size-4" />
           Dashboard
         </a>
-        <a href="#" className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground hover:bg-accent/30 transition-colors font-medium">
-          <BookOpen className="size-4" />
-          Lessons
-        </a>
+        
         <button 
           onClick={onProgressClick}
           className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground hover:bg-accent/30 transition-colors font-medium"
@@ -56,7 +53,7 @@ export function Sidebar({ history, onSelectLesson, onNewSimulation, onProgressCl
       {/* History */}
       <div className="flex-1 overflow-y-auto">
         <h2 className="mb-3 px-3 text-xs font-bold tracking-wider text-primary uppercase">
-          Recent Simulations
+          Recent Lessons
         </h2>
         {history.length === 0 ? (
           <div className="px-3 text-sm text-muted-foreground">No history yet</div>

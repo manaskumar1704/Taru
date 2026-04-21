@@ -89,7 +89,7 @@ export function ProgressModal({ isOpen, onClose, history }: ProgressModalProps) 
             <div className="flex flex-col items-center justify-center py-8 text-center">
               <AlertCircle className="size-12 text-muted-foreground/50 mb-4" />
               <p className="text-muted-foreground">
-                Complete more quizzes to see your learning progress.
+                You haven&apos;t attempted any quizzes yet. Complete some quizzes to unlock your personalized learning insights.
               </p>
             </div>
           )}
