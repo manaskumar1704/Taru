@@ -11,6 +11,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog"
 import { LessonHistoryItem } from "@/hooks/useLocalHistory"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 import { TrendingUp, Target, Award, AlertCircle } from "lucide-react"
 
 interface ProgressModalProps {
@@ -110,9 +111,9 @@ export function ProgressModal({ isOpen, onClose, history }: ProgressModalProps) 
           )}
 
           {error && (
-            <div className="p-4 rounded-lg bg-destructive/10 border border-destructive/30 text-destructive text-sm">
-              {error}
-            </div>
+            <Alert variant="destructive" className="bg-destructive/10 border-destructive/20">
+              <AlertDescription className="text-destructive font-medium">{error}</AlertDescription>
+            </Alert>
           )}
 
           {analysis && !isLoading && (
