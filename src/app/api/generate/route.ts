@@ -32,9 +32,15 @@ export async function POST(req: NextRequest) {
     }
 
     // 2. Model Initialization with Fallbacks
-    const groq = new ChatGroq({
+    const groqPrimary = new ChatGroq({
       apiKey: process.env.GROQ_API_KEY,
-      model: "mixtral-8x7b-32768",
+      model: "llama3-8b-8192",
+      temperature: 0.3,
+    });
+
+    const groqFallback = new ChatGroq({
+      apiKey: process.env.GROQ_API_KEY,
+      model: "llama-3.1-8b-instant",
       temperature: 0.3,
     });
 
@@ -44,7 +50,7 @@ export async function POST(req: NextRequest) {
       temperature: 0.3,
     });
 
-    const modelWithFallback = groq.withFallbacks({ fallbacks: [gemini] });
+    const modelWithFallback = groqPrimary.withFallbacks({ fallbacks: [groqFallback, gemini] });
 
     // 3. Parser Initialization
     const parser = StructuredOutputParser.fromZodSchema(lessonSchema);
