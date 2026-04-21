@@ -6,7 +6,7 @@ import { StructuredOutputParser } from "@langchain/core/output_parsers";
 import { PromptTemplate } from "@langchain/core/prompts";
 
 // 1. Zod Response Schema
-const lessonSchema = z.object({
+export const lessonSchema = z.object({
   summary: z.string().describe("A 2-3 sentence beginner-friendly summary of the topic"),
   keyPoints: z.array(z.string()).describe("4-6 key points explaining the topic simply"),
   quiz: z.array(
